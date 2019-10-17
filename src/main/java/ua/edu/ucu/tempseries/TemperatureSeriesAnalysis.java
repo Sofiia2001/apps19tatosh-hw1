@@ -1,15 +1,18 @@
 package ua.edu.ucu.tempseries;
 
 import java.util.Arrays;
-import java.lang.Math;
 import java.util.InputMismatchException;
-import java.util.Scanner;
 
 public class TemperatureSeriesAnalysis {
     private double[] temperatureSeries;
+    private double tempBefore;
+    private double minDiff;
+    private double[] toReturn;
+    private double[] result;
+    private int seriesIndex;
 
     public TemperatureSeriesAnalysis() {
-
+        throw new InputMismatchException();
     }
 
     private void checkLength() {
@@ -19,8 +22,11 @@ public class TemperatureSeriesAnalysis {
     }
 
     public TemperatureSeriesAnalysis(double[] temperatureSeries) {
+        int EXCLUDE = -273;
         for (int i = 0; i < temperatureSeries.length; i++) {
-            if (temperatureSeries[i] < -273) throw new InputMismatchException();
+            if (temperatureSeries[i] < EXCLUDE) {
+                throw new InputMismatchException();
+            }
         }
         this.temperatureSeries = Arrays.copyOf(temperatureSeries, temperatureSeries.length);
     }
@@ -36,12 +42,13 @@ public class TemperatureSeriesAnalysis {
 
     public double deviation() {
         checkLength();
-        double to_return = 0;
+        double toReturn = 0;
         double average = average();
         for (int i = 0; i < this.temperatureSeries.length; i++) {
-            to_return += Math.pow(this.temperatureSeries[i] - average, 2);
+            toReturn += (this.temperatureSeries[i] - average) *
+                    (this.temperatureSeries[i] - average);
         }
-        return Math.sqrt(to_return / this.temperatureSeries.length);
+        return Math.sqrt(toReturn / this.temperatureSeries.length);
     }
 
     public double min() {
@@ -68,18 +75,22 @@ public class TemperatureSeriesAnalysis {
 
     public double findTempClosestToZero() {
         checkLength();
-        double temp_before;
         double closest = this.temperatureSeries[0];
         Arrays.sort(this.temperatureSeries);
         for (int i = 1; i < this.temperatureSeries.length; i++) {
-            temp_before = this.temperatureSeries[i - 1];
-            if (this.temperatureSeries[i] >= 0 && temp_before <= 0) {
+            tempBefore = this.temperatureSeries[i - 1];
+            if (this.temperatureSeries[i] >= 0 && tempBefore <= 0) {
 //                check if the found values are equal
-                if (this.temperatureSeries[i] == Math.abs(temp_before)) closest = Math.abs(temp_before);
+                if (this.temperatureSeries[i] == Math.abs(tempBefore)) {
+                    closest = Math.abs(tempBefore);
+                }
 //                else closest is minimum and check whether it is less than 0
                 else {
-                    closest = Math.min(this.temperatureSeries[i], Math.abs(temp_before));
-                    if (closest == Math.abs(temp_before)) closest = temp_before;
+                    closest = Math.min(this.temperatureSeries[i], Math.abs(tempBefore));
+                    if (closest == Math.abs(tempBefore)) {
+                        closest = tempBefore;
+                    }
+
                 }
                 break;
             }
@@ -90,11 +101,11 @@ public class TemperatureSeriesAnalysis {
 
     public double findTempClosestToValue(double tempValue) {
         checkLength();
-        double min_diff = Math.abs(tempValue - this.temperatureSeries[0]);
+        minDiff = Math.abs(tempValue - this.temperatureSeries[0]);
         double closest = this.temperatureSeries[0];
         for (int i = 1; i < this.temperatureSeries.length; i++) {
-            if (Math.abs(tempValue - this.temperatureSeries[i]) < min_diff) {
-                min_diff = Math.abs(tempValue - this.temperatureSeries[i]);
+            if (Math.abs(tempValue - this.temperatureSeries[i]) < minDiff) {
+                minDiff = Math.abs(tempValue - this.temperatureSeries[i]);
                 closest = this.temperatureSeries[i];
             }
         }
@@ -102,55 +113,54 @@ public class TemperatureSeriesAnalysis {
     }
 
     public double[] findTempsLessThen(double tempValue) {
-        double[] to_return = new double[0];
+        toReturn = new double[0];
         int index = 0;
         for (int i = 0; i < this.temperatureSeries.length; i++) {
             if (this.temperatureSeries[i] < tempValue) {
-                double[] temp = Arrays.copyOf(to_return, to_return.length + 1);
-                to_return = Arrays.copyOf(temp, temp.length);
-                to_return[index] = this.temperatureSeries[i];
+                double[] temp = Arrays.copyOf(toReturn, toReturn.length + 1);
+                toReturn = Arrays.copyOf(temp, temp.length);
+                toReturn[index] = this.temperatureSeries[i];
                 index += 1;
             }
         }
-        return to_return;
+        return toReturn;
     }
 
     public double[] findTempsGreaterThen(double tempValue) {
-        double[] to_return = new double[0];
+        result = new double[0];
         int index = 0;
         for (int i = 0; i < this.temperatureSeries.length; i++) {
             if (this.temperatureSeries[i] >= tempValue) {
-                double[] temp = Arrays.copyOf(to_return, to_return.length + 1);
-                to_return = Arrays.copyOf(temp, temp.length);
-                to_return[index] = this.temperatureSeries[i];
+                double[] temp = Arrays.copyOf(result, result.length + 1);
+                result = Arrays.copyOf(temp, temp.length);
+                result[index] = this.temperatureSeries[i];
                 index += 1;
             }
         }
-        return to_return;
+        return result;
     }
 
     public TempSummaryStatistics summaryStatistics() {
         checkLength();
-        TempSummaryStatistics statistics = new TempSummaryStatistics(average(), deviation(), min(), max());
+        TempSummaryStatistics statistics = new
+                TempSummaryStatistics(average(), deviation(), min(), max());
         return statistics;
     }
 
     public int addTemps(double... temps) {
-        int series_index = this.temperatureSeries.length - 1;
+        seriesIndex = this.temperatureSeries.length - 1;
         int amount = this.temperatureSeries.length;
 
         for (int i = 0; i < temps.length; i++) {
-            if (series_index == this.temperatureSeries.length - 1) {
-                double[] temp = Arrays.copyOf(this.temperatureSeries, this.temperatureSeries.length * 2);
+            if (seriesIndex == this.temperatureSeries.length - 1) {
+                double[] temp = Arrays.copyOf(this.temperatureSeries,
+                        this.temperatureSeries.length * 2);
                 this.temperatureSeries = Arrays.copyOf(temp, temp.length);
             }
-            series_index += 1;
-            this.temperatureSeries[series_index] = temps[i];
+            seriesIndex += 1;
+            this.temperatureSeries[seriesIndex] = temps[i];
             amount += 1;
         }
-//        for (int j = 0; j < this.temperatureSeries.length; j++) {
-//            if (this.temperatureSeries[j] != )
-//            sum += this.temperatureSeries[j];
         return amount;
 
     }
