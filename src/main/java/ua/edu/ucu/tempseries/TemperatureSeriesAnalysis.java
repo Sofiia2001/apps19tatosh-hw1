@@ -4,14 +4,8 @@ import java.util.Arrays;
 import java.util.InputMismatchException;
 
 public class TemperatureSeriesAnalysis {
+    private static final int EXCLUDE = -273;
     private double[] temperatureSeries;
-    private static final int exclude = -273;
-
-    private void checkLength() {
-        if (this.temperatureSeries.length == 0) {
-            throw new IllegalArgumentException();
-        }
-    }
 
     public TemperatureSeriesAnalysis() {
         throw new InputMismatchException();
@@ -19,12 +13,18 @@ public class TemperatureSeriesAnalysis {
 
     public TemperatureSeriesAnalysis(double[] temperatureSeries) {
         for (int i = 0; i < temperatureSeries.length; i++) {
-            if (temperatureSeries[i] < exclude) {
+            if (temperatureSeries[i] < EXCLUDE) {
                 throw new InputMismatchException();
             }
         }
         this.temperatureSeries = Arrays.copyOf(temperatureSeries,
                 temperatureSeries.length);
+    }
+
+    private void checkLength() {
+        if (this.temperatureSeries.length == 0) {
+            throw new IllegalArgumentException();
+        }
     }
 
     public double average() {
@@ -128,7 +128,8 @@ public class TemperatureSeriesAnalysis {
         int index = 0;
         for (int i = 0; i < this.temperatureSeries.length; i++) {
             if (this.temperatureSeries[i] >= tempValue) {
-                double[] temp = Arrays.copyOf(result, result.length + 1);
+                double[] temp = Arrays.copyOf(result,
+                        result.length + 1);
                 result = Arrays.copyOf(temp, temp.length);
                 result[index] = this.temperatureSeries[i];
                 index += 1;
