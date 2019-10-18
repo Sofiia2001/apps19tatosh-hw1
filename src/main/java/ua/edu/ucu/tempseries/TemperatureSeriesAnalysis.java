@@ -114,7 +114,8 @@ public class TemperatureSeriesAnalysis {
         int index = 0;
         for (int i = 0; i < this.temperatureSeries.length; i++) {
             if (this.temperatureSeries[i] < tempValue) {
-                double[] temp = Arrays.copyOf(toReturnArr, toReturnArr.length + 1);
+                double[] temp = Arrays.copyOf(toReturnArr,
+                        toReturnArr.length + 1);
                 toReturnArr = Arrays.copyOf(temp, temp.length);
                 toReturnArr[index] = this.temperatureSeries[i];
                 index += 1;
