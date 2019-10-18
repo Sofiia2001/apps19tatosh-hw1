@@ -5,6 +5,7 @@ import java.util.InputMismatchException;
 
 public class TemperatureSeriesAnalysis {
     private static final int EXCLUDE = -273;
+    private static final double DEVIATION = .0000001;
     private double[] temperatureSeries;
 
     public TemperatureSeriesAnalysis() {
@@ -77,14 +78,15 @@ public class TemperatureSeriesAnalysis {
             double tempBefore = this.temperatureSeries[i - 1];
             if (this.temperatureSeries[i] >= 0 && tempBefore <= 0) {
 //                check if the found values are equal
-                if (Math.abs(this.temperatureSeries[i] - Math.abs(tempBefore)) < .0000001) {
+                if (Math.abs(this.temperatureSeries[i]
+                        - Math.abs(tempBefore)) < DEVIATION) {
                     closest = Math.abs(tempBefore);
                 }
 //                else closest is minimum and check whether it is less than 0
                 else {
                     closest = Math.min(this.temperatureSeries[i],
                             Math.abs(tempBefore));
-                    if (Math.abs(closest - Math.abs(tempBefore)) < .0000001) {
+                    if (Math.abs(closest - Math.abs(tempBefore)) < DEVIATION) {
                         closest = tempBefore;
                     }
 
